@@ -41,84 +41,85 @@ class _GamePanelState extends State<GamePanel> {
 
   List move(int arg) {
     List newModel = [...model.map((e) => List.from(e))];
-    bool diff = false;
     if (arg == 2 || arg == 8) {
-      for (int i = 0; i < newModel.length; i++) {
-        // valueA = model[0][i] valueB = model[j][i]
-        int pointA = arg == 2 ? 0 : 3;
-        for (int j = 1; j < newModel[i].length; j++) {
-          int row = arg == 2 ? j : 3 - j;
-          if (newModel[row][i] == 0) continue;
-          if (newModel[pointA][i] == newModel[row][i]) {
-            newModel[pointA][i] *= 2;
-            arg == 2 ? pointA++ : pointA--;
-            newModel[row][i] = 0;
-            diff = true;
-          } else if (newModel[pointA][i] != newModel[row][i]) {
-            pointA = row;
+      for (int i = 0; i < 4; i++) {
+        List col = [];
+        int count = 0;
+        bool justMerge = false;
+        for (int j = 0; j < 4; j++) {
+          if (newModel[j][i] != 0) {
+            if (col.indexOf(newModel[j][i]) == col.length - 1 &&
+                col.isNotEmpty &&
+                !justMerge) {
+              col[col.length - 1] *= 2;
+              count++;
+              justMerge = true;
+              continue;
+            } else {
+              col.add(newModel[j][i]);
+            }
+            justMerge = false;
+          } else {
+            count++;
           }
         }
-        for (int j = 0; j < newModel[i].length; j++) {
-          int pointB = arg == 8 ? 0 : 3;
-          int row = arg == 8 ? j : 3 - j;
-          if (newModel[row][i] == 0) {
-            while (pointB <= 3 && pointB >= 0) {
-              if (newModel[pointB][i] != 0) {
-                newModel[row][i] = newModel[pointB][i];
-                newModel[pointB][i] = 0;
-                diff = true;
-                break;
-              }
-              arg == 8 ? pointB++ : pointB--;
-            }
-          }
+        for (int j = 0; j < count; j++) {
+          col.insert(arg == 2 ? col.length : 0, 0);
+        }
+        for (int j = 0; j < 4; j++) {
+          newModel[j][i] = col[j];
         }
       }
     } else if (arg == 4 || arg == 6) {
       for (int i = 0; i < newModel.length; i++) {
-        int pointA = arg == 4 ? 0 : 3;
-        for (int j = 1; j < newModel[i].length; j++) {
-          int col = arg == 4 ? j : 3 - j;
-          if (newModel[i][col] == 0) continue;
-          if (newModel[i][pointA] == newModel[i][col]) {
-            newModel[i][pointA] *= 2;
-            arg == 4 ? pointA++ : pointA--;
-            newModel[i][col] = 0;
-            diff = true;
-          } else if (newModel[i][pointA] != newModel[i][col]) {
-            pointA = col;
-          }
-        }
-        for (int j = 0; j < newModel[i].length; j++) {
-          int pointB = arg == 6 ? 0 : 3;
-          int col = arg == 6 ? j : 3 - j;
-          if (newModel[i][col] == 0) {
-            while (pointB <= 3 && pointB >= 0) {
-              if (newModel[i][pointB] != 0) {
-                newModel[i][col] = newModel[i][pointB];
-                newModel[i][pointB] = 0;
-                diff = true;
-                break;
-              }
-              arg == 6 ? pointB++ : pointB--;
+        List row = [];
+        int count = 0;
+        bool justMerge = false;
+        for (int j = 0; j < 4; j++) {
+          if (newModel[i][j] != 0) {
+            if (row.indexOf(newModel[i][j]) == row.length - 1 &&
+                row.isNotEmpty &&
+                !justMerge) {
+              row[row.length - 1] *= 2;
+              count++;
+              justMerge = true;
+              continue;
+            } else {
+              row.add(newModel[i][j]);
             }
+            justMerge = false;
+          } else {
+            count++;
+          }
+        }
+        for (int j = 0; j < count; j++) {
+          row.insert(arg == 4 ? row.length : 0, 0);
+        }
+        for (int j = 0; j < 4; j++) {
+          newModel[i][j] = row[j];
+        }
+      }
+    }
+    bool diff = false;
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (model[i][j] != newModel[i][j]) {
+          diff = true;
+        }
+      }
+    }
+    if (diff) {
+      List emptyList = [];
+      for (int i = 0; i < newModel.length; i++) {
+        for (int j = 0; j < newModel[i].length; j++) {
+          if (newModel[i][j] == 0) {
+            emptyList.add([i, j]);
           }
         }
       }
-    }
-
-    List emptyList = [];
-    for (int i = 0; i < newModel.length; i++) {
-      for (int j = 0; j < newModel[i].length; j++) {
-        if (newModel[i][j] == 0) {
-          emptyList.add([i, j]);
-        }
-      }
-    }
-    var random = Random();
-    int num = random.nextInt(emptyList.length);
-    newModel[emptyList[num][0]][emptyList[num][1]] = 2;
-    if (diff) {
+      var random = Random();
+      int num = random.nextInt(emptyList.length);
+      newModel[emptyList[num][0]][emptyList[num][1]] = 2;
       return newModel;
     } else {
       return model;
