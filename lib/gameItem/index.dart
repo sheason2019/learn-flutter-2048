@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class GameItem extends StatefulWidget {
   final int j;
-  const GameItem(this.j, {Key? key}) : super(key: key);
+  final Size size;
+  const GameItem(this.j, {Key? key, required this.size}) : super(key: key);
 
   @override
   _GameItemState createState() => _GameItemState();
@@ -63,6 +64,8 @@ class _GameItemState extends State<GameItem>
             child: Stack(children: [
               Container(
                   margin: const EdgeInsets.all(4.0),
+                  height: widget.size.height,
+                  width: widget.size.width,
                   decoration: BoxDecoration(
                       color: widget.j == 0 ? null : colorMap[widget.j],
                       borderRadius: const BorderRadius.all(Radius.circular(8))),

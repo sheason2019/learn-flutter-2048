@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:math';
-import 'dart:developer' as developer;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import 'package:learn_flutter/gameItem/index.dart';
 import 'package:learn_flutter/gameModel/index.dart';
 import 'package:learn_flutter/itemModel/index.dart';
 import 'package:learn_flutter/itemSlot/index.dart';
+import 'package:learn_flutter/slotModel/index.dart';
 
 class GamePanel extends StatefulWidget {
   const GamePanel({Key? key}) : super(key: key);
@@ -17,10 +18,22 @@ class GamePanel extends StatefulWidget {
 
 class _GamePanelState extends State<GamePanel> {
   GameModel model = GameModel();
-  bool _init = true;
+  Size itemSize = const Size(0, 0);
+  List<List<Offset>> slotPosition = [];
+  Offset parentOffset = Offset.zero;
 
-  List move(int arg) {
-    List newModel = [...model.getModel().map((e) => List.from(e))];
+  Offset getParentPosition() {
+    RenderBox? renderObject = context.findRenderObject() as RenderBox;
+    Offset offset = renderObject.localToGlobal(Offset.zero);
+
+    return offset;
+  }
+
+  List<List<ItemModel>> move(int arg) {
+    List<List<ItemModel>> newModel = [
+      ...model.getModel().map((e) => List.from(e))
+    ];
+
     if (arg == 2 || arg == 8) {
       for (int i = 0; i < 4; i++) {
         List<ItemModel> col = [];
@@ -122,25 +135,36 @@ class _GamePanelState extends State<GamePanel> {
   }
 
   @override
-  void didUpdateWidget(covariant GamePanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   void initState() {
     super.initState();
-    if (_init) {
+    Timer(const Duration(milliseconds: 0), () {
+      List<List<SlotModel>> slotModel = model.getSlotModel();
+      List<List<Offset>> _slotPosition = [];
+      for (List i in slotModel) {
+        List<Offset> row = [];
+        for (SlotModel j in i) {
+          row.add(j.getSlotOffset());
+        }
+        _slotPosition.add(row);
+      }
       setState(() {
+        Size? temp = slotModel[0][0].getSlotSize();
+        slotPosition = _slotPosition;
+        if (temp == null) return;
+        itemSize = Size(temp.width - 8, temp.height - 8);
         model.setModel(move(0));
+        parentOffset = getParentPosition();
       });
-      _init = false;
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     bool hasMove = true;
     Offset source = const Offset(0, 0);
+
+    List<List<ItemModel>> itemModel = model.getModel();
+    List<List<SlotModel>> slotModel = model.getSlotModel();
 
     return AspectRatio(
         aspectRatio: 1,
@@ -190,19 +214,36 @@ class _GamePanelState extends State<GamePanel> {
                 child: Stack(children: [
                   Column(
                     children: [
-                      for (var i in model.getModel())
+                      for (int i = 0; i < 4; i++)
                         Row(
                           children: [
-                            for (var j in i)
+                            for (int j = 0; j < 4; j++)
                               Expanded(
                                   child: Stack(children: [
-                                const ItemSlot(),
-                                GameItem(j.val, key: j.itemKey),
+                                ItemSlot(
+                                  key: slotModel[i][j].slotKey,
+                                ),
                               ]))
                           ],
                         )
                     ],
-                  )
+                  ),
+                  for (int i = 0; i < 4; i++)
+                    for (int j = 0; j < 4; j++)
+                      Positioned(
+                          left: slotPosition.isEmpty
+                              ? 0
+                              : slotPosition[i][j].dx - parentOffset.dx - 20,
+                          top: slotPosition.isEmpty
+                              ? 0
+                              : slotPosition[i][j].dy - parentOffset.dy - 20,
+                          right: 0,
+                          bottom: 0,
+                          child: GameItem(
+                            itemModel[i][j].val,
+                            key: itemModel[i][j].itemKey,
+                            size: itemSize,
+                          )),
                 ]))));
   }
 }
