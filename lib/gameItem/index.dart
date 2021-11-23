@@ -12,15 +12,21 @@ class GameItem extends StatefulWidget {
 class _GameItemState extends State<GameItem>
     with SingleTickerProviderStateMixin {
   static Map colorMap = {
-    0: Colors.orange[50],
     2: Colors.orange[200],
     4: Colors.orange[300],
     8: Colors.orange[400],
-    16: Colors.orange[500],
+    16: Colors.orange,
     32: Colors.orange[600],
     64: Colors.orange[700],
     128: Colors.orange[800],
-    256: Colors.orange[900],
+    256: Colors.deepOrange[400],
+    512: Colors.deepOrange[500],
+    1024: Colors.deepOrange[600],
+    2048: Colors.deepOrange[700],
+    4096: Colors.deepOrange[800],
+    8192: Colors.deepOrange[900],
+    16384: Colors.red[700],
+    32768: Colors.red[800],
   };
 
   late Animation<double> animation;
@@ -30,8 +36,8 @@ class _GameItemState extends State<GameItem>
   void initState() {
     super.initState();
     controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 400));
-    animation = Tween(begin: 44.0, end: 4.0).animate(controller)
+        vsync: this, duration: const Duration(milliseconds: 300));
+    animation = Tween(begin: 0.0, end: 1.0).animate(controller)
       ..addListener(() {
         setState(() {});
       });
@@ -50,18 +56,26 @@ class _GameItemState extends State<GameItem>
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-        aspectRatio: 1,
-        child: Stack(children: [
-          Container(
-              margin: EdgeInsets.all(animation.value),
-              decoration: BoxDecoration(
-                  color: colorMap[widget.j],
-                  borderRadius: const BorderRadius.all(Radius.circular(8))),
-              child: Center(
-                child: widget.j == 0 ? null : Text(widget.j.toString()),
-              )),
-        ]));
+    return Transform.scale(
+        scale: animation.value,
+        child: AspectRatio(
+            aspectRatio: 1,
+            child: Stack(children: [
+              Container(
+                  margin: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                      color: widget.j == 0 ? null : colorMap[widget.j],
+                      borderRadius: const BorderRadius.all(Radius.circular(8))),
+                  child: Center(
+                    child: widget.j == 0
+                        ? null
+                        : Text(
+                            widget.j.toString(),
+                            style: const TextStyle(
+                                fontSize: 32, color: Color(0xDFFFFFFF)),
+                          ),
+                  )),
+            ])));
   }
 
   @override
