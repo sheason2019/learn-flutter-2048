@@ -23,7 +23,7 @@ class _GamePanelState extends State<GamePanel> {
     List newModel = [...model.getModel().map((e) => List.from(e))];
     if (arg == 2 || arg == 8) {
       for (int i = 0; i < 4; i++) {
-        List col = [];
+        List<ItemModel> col = [];
         // 清除为0的项
         for (int j = 0; j < 4; j++) {
           if (newModel[j][i].val != 0) {
@@ -36,8 +36,10 @@ class _GamePanelState extends State<GamePanel> {
           int last = arg == 2 ? target - 1 : target + 1;
           if (last < 0 || last > col.length - 1) continue;
           if (col[target].val == col[last].val) {
-            col[last] = col[last].from(val: col[last].val * 2);
-            col[target] = col[target].from(val: 0);
+            col[last] = col[last].from(col[last]);
+            col[last].val *= 2;
+            col[target] = col[target].from(col[target]);
+            col[target].val = 0;
           }
         }
         // 再次清除为0的项
@@ -60,7 +62,7 @@ class _GamePanelState extends State<GamePanel> {
       }
     } else if (arg == 4 || arg == 6) {
       for (int i = 0; i < newModel.length; i++) {
-        List row = [];
+        List<ItemModel> row = [];
         for (int j = 0; j < 4; j++) {
           if (newModel[i][j].val != 0) {
             row.add(newModel[i][j]);
@@ -71,8 +73,10 @@ class _GamePanelState extends State<GamePanel> {
           int last = arg == 4 ? target - 1 : target + 1;
           if (last < 0 || last > row.length - 1) continue;
           if (row[target].val == row[last].val) {
-            row[last] = row[last].from(val: row[last].val * 2);
-            row[target] = row[target].from(val: 0);
+            row[last] = row[last].from(row[last]);
+            row[last].val *= 2;
+            row[target] = row[target].from(row[target]);
+            row[target].val = 0;
           }
         }
         List rowWithoutZero = [];
@@ -99,7 +103,6 @@ class _GamePanelState extends State<GamePanel> {
         }
       }
     }
-    print(diff);
     if (diff || arg == 0) {
       List emptyList = [];
       for (int i = 0; i < newModel.length; i++) {
@@ -194,7 +197,7 @@ class _GamePanelState extends State<GamePanel> {
                               Expanded(
                                   child: Stack(children: [
                                 const ItemSlot(),
-                                GameItem(j.val),
+                                GameItem(j.val, key: j.itemKey),
                               ]))
                           ],
                         )
