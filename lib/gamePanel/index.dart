@@ -24,67 +24,70 @@ class _GamePanelState extends State<GamePanel> {
     if (arg == 2 || arg == 8) {
       for (int i = 0; i < 4; i++) {
         List col = [];
-        int count = 0;
-        bool justMerge = false;
+        // 清除为0的项
         for (int j = 0; j < 4; j++) {
           if (newModel[j][i].val != 0) {
-            bool shouldMerge = false;
-            if (col.isNotEmpty) {
-              if (col[col.length - 1].val == newModel[j][i].val) {
-                shouldMerge = true;
-              }
-            }
-            if (shouldMerge && !justMerge) {
-              col[col.length - 1].val *= 2;
-              count++;
-              justMerge = true;
-              continue;
-            } else {
-              col.add(newModel[j][i]);
-            }
-            justMerge = false;
-          } else {
-            count++;
+            col.add(newModel[j][i]);
           }
         }
-        for (int j = 0; j < count; j++) {
-          col.insert(arg == 2 ? col.length : 0, ItemModel(val: 0));
+        // 进行相加操作
+        for (int j = 0; j < col.length; j++) {
+          int target = arg == 2 ? j : col.length - 1 - j;
+          int last = arg == 2 ? target - 1 : target + 1;
+          if (last < 0 || last > col.length - 1) continue;
+          if (col[target].val == col[last].val) {
+            col[last] = col[last].from(val: col[last].val * 2);
+            col[target] = col[target].from(val: 0);
+          }
         }
+        // 再次清除为0的项
+        List colWithoutZero = [];
+        for (int j = 0; j < col.length; j++) {
+          if (col[j].val != 0) {
+            colWithoutZero.add(col[j]);
+          }
+        }
+        // 插入为0的项
+        int loopCount = 4 - colWithoutZero.length;
+        for (int j = 0; j < loopCount; j++) {
+          colWithoutZero.insert(
+              arg == 2 ? colWithoutZero.length : 0, ItemModel(val: 0));
+        }
+        // 合并到newModel
         for (int j = 0; j < 4; j++) {
-          newModel[j][i] = col[j];
+          newModel[j][i] = colWithoutZero[j];
         }
       }
     } else if (arg == 4 || arg == 6) {
       for (int i = 0; i < newModel.length; i++) {
         List row = [];
-        int count = 0;
-        bool justMerge = false;
         for (int j = 0; j < 4; j++) {
           if (newModel[i][j].val != 0) {
-            bool shouldMerge = false;
-            if (row.isNotEmpty) {
-              if (row[row.length - 1].val == newModel[i][j].val) {
-                shouldMerge = true;
-              }
-            }
-            if (shouldMerge && !justMerge) {
-              row[row.length - 1].val *= 2;
-              count++;
-              justMerge = true;
-              continue;
-            } else {
-              row.add(newModel[i][j]);
-            }
-            justMerge = false;
-          } else {
-            count++;
+            row.add(newModel[i][j]);
           }
         }
-        for (int j = 0; j < count; j++) {
-          row.insert(arg == 4 ? row.length : 0, ItemModel(val: 0));
+        for (int j = 0; j < row.length; j++) {
+          int target = arg == 4 ? j : row.length - 1 - j;
+          int last = arg == 4 ? target - 1 : target + 1;
+          if (last < 0 || last > row.length - 1) continue;
+          if (row[target].val == row[last].val) {
+            row[last] = row[last].from(val: row[last].val * 2);
+            row[target] = row[target].from(val: 0);
+          }
+        }
+        List rowWithoutZero = [];
+        for (int j = 0; j < row.length; j++) {
+          if (row[j].val != 0) {
+            rowWithoutZero.add(row[j]);
+          }
+        }
+        int loopCount = 4 - rowWithoutZero.length;
+        for (int j = 0; j < loopCount; j++) {
+          rowWithoutZero.insert(
+              arg == 4 ? rowWithoutZero.length : 0, ItemModel(val: 0));
         }
         for (int j = 0; j < 4; j++) {
-          newModel[i][j] = row[j];
+          newModel[i][j] = rowWithoutZero[j];
         }
       }
     }
@@ -96,6 +99,7 @@ class _GamePanelState extends State<GamePanel> {
         }
       }
     }
+    print(diff);
     if (diff || arg == 0) {
       List emptyList = [];
       for (int i = 0; i < newModel.length; i++) {
