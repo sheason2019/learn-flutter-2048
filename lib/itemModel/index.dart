@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ItemModel {
-  int val = 0;
-  GlobalKey slotKey = GlobalKey();
+  int val;
   GlobalKey itemKey = GlobalKey();
-  ItemModel({this.val = 0});
+  Offset offset;
+  ItemModel({this.val = 0, this.offset = Offset.zero});
 
-  from(ItemModel item) {
+  static from(ItemModel item) {
     ItemModel result = ItemModel();
     result.val = item.val;
     result.itemKey = item.itemKey;
-    result.slotKey = item.slotKey;
+    result.offset = item.offset;
     return result;
   }
 }

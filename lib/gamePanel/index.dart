@@ -49,9 +49,9 @@ class _GamePanelState extends State<GamePanel> {
           int last = arg == 2 ? target - 1 : target + 1;
           if (last < 0 || last > col.length - 1) continue;
           if (col[target].val == col[last].val) {
-            col[last] = col[last].from(col[last]);
+            col[last] = ItemModel.from(col[last]);
             col[last].val *= 2;
-            col[target] = col[target].from(col[target]);
+            col[target] = ItemModel.from(col[target]);
             col[target].val = 0;
           }
         }
@@ -71,6 +71,7 @@ class _GamePanelState extends State<GamePanel> {
         // 合并到newModel
         for (int j = 0; j < 4; j++) {
           newModel[j][i] = colWithoutZero[j];
+          newModel[j][i].offset = Offset(j.toDouble(), i.toDouble());
         }
       }
     } else if (arg == 4 || arg == 6) {
@@ -86,9 +87,9 @@ class _GamePanelState extends State<GamePanel> {
           int last = arg == 4 ? target - 1 : target + 1;
           if (last < 0 || last > row.length - 1) continue;
           if (row[target].val == row[last].val) {
-            row[last] = row[last].from(row[last]);
+            row[last] = ItemModel.from(row[last]);
             row[last].val *= 2;
-            row[target] = row[target].from(row[target]);
+            row[target] = ItemModel.from(row[target]);
             row[target].val = 0;
           }
         }
@@ -105,9 +106,20 @@ class _GamePanelState extends State<GamePanel> {
         }
         for (int j = 0; j < 4; j++) {
           newModel[i][j] = rowWithoutZero[j];
+          newModel[i][j].offset = Offset(i.toDouble(), j.toDouble());
         }
       }
     }
+    bool diff = isModelDiff(newModel, model.getModel());
+    if (diff || arg == 0) {
+      return insertItem(newModel);
+    } else {
+      return model.getModel();
+    }
+  }
+
+  bool isModelDiff(
+      List<List<ItemModel>> newModel, List<List<ItemModel>> oldModel) {
     bool diff = false;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
@@ -116,22 +128,26 @@ class _GamePanelState extends State<GamePanel> {
         }
       }
     }
-    if (diff || arg == 0) {
-      List emptyList = [];
-      for (int i = 0; i < newModel.length; i++) {
-        for (int j = 0; j < newModel[i].length; j++) {
-          if (newModel[i][j].val == 0) {
-            emptyList.add([i, j]);
-          }
+    return diff;
+  }
+
+  List<List<ItemModel>> insertItem(List<List<ItemModel>> newModel) {
+    // 为了在以后实现撤销功能，这里必须实现纯函数，
+    List<List<ItemModel>> result = [...newModel.map((e) => List.from(e))];
+    List emptyList = [];
+    for (int i = 0; i < newModel.length; i++) {
+      for (int j = 0; j < newModel[i].length; j++) {
+        if (newModel[i][j].val == 0) {
+          emptyList.add([i, j]);
         }
       }
-      var random = Random();
-      int num = random.nextInt(emptyList.length);
-      newModel[emptyList[num][0]][emptyList[num][1]] = ItemModel(val: 2);
-      return newModel;
-    } else {
-      return model.getModel();
     }
+    var random = Random();
+    int num = random.nextInt(emptyList.length);
+    ItemModel target = result[emptyList[num][0]][emptyList[num][1]] =
+        ItemModel.from(newModel[emptyList[num][0]][emptyList[num][1]]);
+    target.val = 2;
+    return result;
   }
 
   @override
@@ -233,12 +249,20 @@ class _GamePanelState extends State<GamePanel> {
                       Positioned(
                           left: slotPosition.isEmpty
                               ? 0
-                              : slotPosition[i][j].dx - parentOffset.dx - 20,
+                              : slotPosition[itemModel[i][j].offset.dx.toInt()]
+                                          [itemModel[i][j].offset.dy.toInt()]
+                                      .dx -
+                                  parentOffset.dx -
+                                  20,
                           top: slotPosition.isEmpty
                               ? 0
-                              : slotPosition[i][j].dy - parentOffset.dy - 20,
-                          right: 0,
-                          bottom: 0,
+                              : slotPosition[itemModel[i][j].offset.dx.toInt()]
+                                          [itemModel[i][j].offset.dy.toInt()]
+                                      .dy -
+                                  parentOffset.dy -
+                                  20,
+                          width: itemSize.width + 8,
+                          height: itemSize.height + 8,
                           child: GameItem(
                             itemModel[i][j].val,
                             key: itemModel[i][j].itemKey,
