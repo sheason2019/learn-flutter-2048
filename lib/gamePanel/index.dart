@@ -8,6 +8,7 @@ import 'package:learn_flutter/gameItem/index.dart';
 import 'package:learn_flutter/gameModel/index.dart';
 import 'package:learn_flutter/itemModel/index.dart';
 import 'package:learn_flutter/itemSlot/index.dart';
+import 'package:learn_flutter/score/score.dart';
 import 'package:learn_flutter/slotModel/index.dart';
 
 class GamePanel extends StatefulWidget {
@@ -86,6 +87,7 @@ class _GamePanelState extends State<GamePanel> {
           Timer(CONSTANTS.moveDuration, () {
             setState(() {
               mergeList[j][1].val *= 2;
+              Score.addScore(mergeList[j][1].val);
             });
           });
         }
@@ -134,6 +136,7 @@ class _GamePanelState extends State<GamePanel> {
           Timer(CONSTANTS.moveDuration, () {
             setState(() {
               mergeList[j][1].val *= 2;
+              Score.addScore(mergeList[j][1].val);
             });
           });
         }

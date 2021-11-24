@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:learn_flutter/score/index.dart';
 
 import 'gamePanel/index.dart';
 
@@ -20,11 +21,12 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('2048'),
-        ),
-        body: const GamePanel(),
-      ),
+          appBar: AppBar(
+            title: const Text('2048'),
+          ),
+          body: Column(
+            children: [ScoreWidget(), const GamePanel()],
+          )),
     );
   }
 }
