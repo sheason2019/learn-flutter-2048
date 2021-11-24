@@ -34,10 +34,12 @@ class _GamePanelState extends State<GamePanel> {
     List<List<ItemModel>> newModel = [
       ...model.getModel().map((e) => List.from(e))
     ];
+    newModel[4] = [];
 
     if (arg == 2 || arg == 8) {
       for (int i = 0; i < 4; i++) {
         List<ItemModel> col = [];
+        List<List<ItemModel>> mergeList = [];
         // 清除为0的项
         for (int j = 0; j < 4; j++) {
           if (newModel[j][i].val != 0) {
@@ -54,6 +56,7 @@ class _GamePanelState extends State<GamePanel> {
             col[last].val *= 2;
             col[target] = ItemModel.from(col[target]);
             col[target].val = 0;
+            mergeList.add([col[target], col[last]]);
           }
         }
         // 再次清除为0的项
@@ -74,10 +77,23 @@ class _GamePanelState extends State<GamePanel> {
           newModel[j][i] = colWithoutZero[j];
           newModel[j][i].offset = Offset(j.toDouble(), i.toDouble());
         }
+        // 合并动画
+        for (int j = 0; j < mergeList.length; j++) {
+          mergeList[j][1].val = mergeList[j][1].val ~/ 2;
+          mergeList[j][0].val = mergeList[j][1].val;
+          mergeList[j][0].offset = mergeList[j][1].offset;
+          newModel[4].add(mergeList[j][0]);
+          Timer(CONSTANTS.moveDuration, () {
+            setState(() {
+              mergeList[j][1].val *= 2;
+            });
+          });
+        }
       }
     } else if (arg == 4 || arg == 6) {
-      for (int i = 0; i < newModel.length; i++) {
+      for (int i = 0; i < 4; i++) {
         List<ItemModel> row = [];
+        List<List<ItemModel>> mergeList = [];
         for (int j = 0; j < 4; j++) {
           if (newModel[i][j].val != 0) {
             row.add(newModel[i][j]);
@@ -92,6 +108,7 @@ class _GamePanelState extends State<GamePanel> {
             row[last].val *= 2;
             row[target] = ItemModel.from(row[target]);
             row[target].val = 0;
+            mergeList.add([row[target], row[last]]);
           }
         }
         List rowWithoutZero = [];
@@ -108,6 +125,17 @@ class _GamePanelState extends State<GamePanel> {
         for (int j = 0; j < 4; j++) {
           newModel[i][j] = rowWithoutZero[j];
           newModel[i][j].offset = Offset(i.toDouble(), j.toDouble());
+        }
+        for (int j = 0; j < mergeList.length; j++) {
+          mergeList[j][1].val = mergeList[j][1].val ~/ 2;
+          mergeList[j][0].val = mergeList[j][1].val;
+          mergeList[j][0].offset = mergeList[j][1].offset;
+          newModel[4].add(mergeList[j][0]);
+          Timer(CONSTANTS.moveDuration, () {
+            setState(() {
+              mergeList[j][1].val *= 2;
+            });
+          });
         }
       }
     }
@@ -242,8 +270,8 @@ class _GamePanelState extends State<GamePanel> {
                         )
                     ],
                   ),
-                  for (int i = 0; i < 4; i++)
-                    for (int j = 0; j < 4; j++)
+                  for (int i = itemModel.length - 1; i >= 0; i--)
+                    for (int j = 0; j < itemModel[i].length; j++)
                       AnimatedPositioned(
                           duration: CONSTANTS.moveDuration,
                           left: slotPosition.isEmpty

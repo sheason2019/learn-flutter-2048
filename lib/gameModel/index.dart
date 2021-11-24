@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:learn_flutter/itemModel/index.dart';
 import 'package:learn_flutter/slotModel/index.dart';
@@ -19,6 +17,8 @@ class GameModel {
       _model.add(row);
       _slotModel.add(slotRow);
     }
+    // 这一行是cache，用来实现合并动画
+    _model.add([]);
   }
   from(GameModel model) {
     return [...model.getModel().map((e) => List.from(e))];
