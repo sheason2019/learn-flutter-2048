@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:learn_flutter/constants.dart';
 import 'package:learn_flutter/gameItem/index.dart';
 import 'package:learn_flutter/gameModel/index.dart';
 import 'package:learn_flutter/itemModel/index.dart';
@@ -110,12 +111,7 @@ class _GamePanelState extends State<GamePanel> {
         }
       }
     }
-    bool diff = isModelDiff(newModel, model.getModel());
-    if (diff || arg == 0) {
-      return insertItem(newModel);
-    } else {
-      return model.getModel();
-    }
+    return newModel;
   }
 
   bool isModelDiff(
@@ -168,7 +164,7 @@ class _GamePanelState extends State<GamePanel> {
         slotPosition = _slotPosition;
         if (temp == null) return;
         itemSize = Size(temp.width - 8, temp.height - 8);
-        model.setModel(move(0));
+        model.setModel(insertItem(model.getModel()));
         parentOffset = getParentPosition();
       });
     });
@@ -195,30 +191,32 @@ class _GamePanelState extends State<GamePanel> {
             },
             onVerticalDragUpdate: (e) {
               if (hasMove) return;
+              List<List<ItemModel>> newModel = model.getModel();
               if (e.localPosition.dy - source.dy > 100) {
-                setState(() {
-                  model.setModel(move(8));
-                });
-                hasMove = true;
+                newModel = move(8);
               } else if (e.localPosition.dy - source.dy < -100) {
-                setState(() {
-                  model.setModel(move(2));
-                });
+                newModel = move(2);
+              }
+              if (isModelDiff(newModel, model.getModel())) {
                 hasMove = true;
+                setState(() {
+                  model.setModel(insertItem(newModel));
+                });
               }
             },
             onHorizontalDragUpdate: (e) {
               if (hasMove) return;
+              List<List<ItemModel>> newModel = model.getModel();
               if (e.localPosition.dx - source.dx > 100) {
-                setState(() {
-                  model.setModel(move(6));
-                });
-                hasMove = true;
+                newModel = move(6);
               } else if (e.localPosition.dx - source.dx < -100) {
-                setState(() {
-                  model.setModel(move(4));
-                });
+                newModel = move(4);
+              }
+              if (isModelDiff(newModel, model.getModel())) {
                 hasMove = true;
+                setState(() {
+                  model.setModel(insertItem(newModel));
+                });
               }
             },
             child: Container(
@@ -246,7 +244,8 @@ class _GamePanelState extends State<GamePanel> {
                   ),
                   for (int i = 0; i < 4; i++)
                     for (int j = 0; j < 4; j++)
-                      Positioned(
+                      AnimatedPositioned(
+                          duration: CONSTANTS.moveDuration,
                           left: slotPosition.isEmpty
                               ? 0
                               : slotPosition[itemModel[i][j].offset.dx.toInt()]
@@ -263,9 +262,9 @@ class _GamePanelState extends State<GamePanel> {
                                   20,
                           width: itemSize.width + 8,
                           height: itemSize.height + 8,
+                          key: itemModel[i][j].itemKey,
                           child: GameItem(
                             itemModel[i][j].val,
-                            key: itemModel[i][j].itemKey,
                             size: itemSize,
                           )),
                 ]))));
