@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:learn_flutter/constants.dart';
 import 'package:learn_flutter/gameItem/index.dart';
 import 'package:learn_flutter/gameModel/index.dart';
+import 'package:learn_flutter/game_controller.dart';
 import 'package:learn_flutter/itemModel/index.dart';
 import 'package:learn_flutter/itemSlot/index.dart';
 import 'package:learn_flutter/score/score.dart';
@@ -181,6 +182,7 @@ class _GamePanelState extends State<GamePanel> {
   void initState() {
     super.initState();
     Timer(const Duration(milliseconds: 0), () {
+      // 获取slot的位置
       List<List<SlotModel>> slotModel = model.getSlotModel();
       List<List<Offset>> _slotPosition = [];
       for (List i in slotModel) {
@@ -198,6 +200,10 @@ class _GamePanelState extends State<GamePanel> {
         model.setModel(insertItem(model.getModel()));
         parentOffset = getParentPosition();
       });
+    });
+    GameController.registRefreshFunc(() {
+      model.setModel(insertItem(model.getModel()));
+      setState(() {});
     });
   }
 

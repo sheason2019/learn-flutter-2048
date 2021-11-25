@@ -5,21 +5,30 @@ import 'package:learn_flutter/slotModel/index.dart';
 class GameModel {
   List<List<ItemModel>> _model = [];
   List<List<SlotModel>> _slotModel = [];
+  static GameModel? instance;
 
-  GameModel() {
+  void init({bool restart = false}) {
+    _model = [];
+    _slotModel = restart ? _slotModel : [];
     for (int i = 0; i < 4; i++) {
       List<ItemModel> row = [];
       List<SlotModel> slotRow = [];
       for (int j = 0; j < 4; j++) {
         row.add(ItemModel(offset: Offset(i.toDouble(), j.toDouble())));
-        slotRow.add(SlotModel());
+        restart ? null : slotRow.add(SlotModel());
       }
       _model.add(row);
-      _slotModel.add(slotRow);
+      restart ? null : _slotModel.add(slotRow);
     }
     // 这一行是cache，用来实现合并动画
     _model.add([]);
   }
+
+  GameModel() {
+    init();
+    instance = this;
+  }
+
   from(GameModel model) {
     return [...model.getModel().map((e) => List.from(e))];
   }

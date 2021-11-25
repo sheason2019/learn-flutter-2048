@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:learn_flutter/menu.dart';
 import 'package:learn_flutter/score/score.dart';
 
 class ScoreWidget extends StatefulWidget {
+  const ScoreWidget({Key? key}) : super(key: key);
+
   @override
   _ScoreWidgetState createState() => _ScoreWidgetState();
 }
@@ -38,16 +41,23 @@ class _ScoreWidgetState extends State<ScoreWidget> {
               )),
           Expanded(
               flex: 1,
-              child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      color: Color(0xFFFFCC80),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text('Menu'),
-                  )))
+              child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const MenuWidget();
+                    }));
+                  },
+                  child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          color: Color(0xFFFFCC80),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text('Menu'),
+                      ))))
         ]));
   }
 }
