@@ -4,7 +4,7 @@ class Score {
     return _score;
   }
 
-  // 这里需要用Function类型的指针指向程序声明的订阅函数，你报nmb你报
+  // 这里需要用Function类型的指针指向程序声明的订阅函数
   // ignore: prefer_function_declarations_over_variables
   static Function _subscribe = () {};
 
