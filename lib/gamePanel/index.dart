@@ -181,7 +181,7 @@ class _GamePanelState extends State<GamePanel> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(milliseconds: 0), () {
+    Timer(const Duration(milliseconds: 100), () {
       // 获取slot的位置
       List<List<SlotModel>> slotModel = model.getSlotModel();
       List<List<Offset>> _slotPosition = [];
