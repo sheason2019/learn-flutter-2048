@@ -25,6 +25,12 @@ class _GamePanelState extends State<GamePanel> {
   List<List<Offset>> slotPosition = [];
   Offset parentOffset = Offset.zero;
 
+  void undo() {
+    setState(() {
+      // GameModel类内部会对model进行操作
+    });
+  }
+
   Offset getParentPosition() {
     RenderBox? renderObject = context.findRenderObject() as RenderBox;
     Offset offset = renderObject.localToGlobal(Offset.zero);
@@ -205,8 +211,10 @@ class _GamePanelState extends State<GamePanel> {
         });
       });
     });
-    GameController.registRefreshFunc(() {
-      model.setModel(insertItem(model.getModel()));
+    GameController.registRefreshFunc(({bool insert = true}) {
+      if (insert) {
+        model.setModel(insertItem(model.getModel()));
+      }
       setState(() {});
     });
   }

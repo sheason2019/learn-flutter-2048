@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:learn_flutter/game_controller.dart';
 import 'package:learn_flutter/menu.dart';
 import 'package:learn_flutter/score/score.dart';
 
@@ -135,16 +136,22 @@ class _ScoreWidgetState extends State<ScoreWidget> {
                         Text(Score.getScore().toString(), style: scoreStyle),
                       ]),
                 ),
-                Container(
-                  height: itemHeight / 7 * 3,
-                  width: itemHeight + 8,
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      color: buttonColor),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [Text('UNDO', style: buttonTextStyle)]),
-                ),
+                GestureDetector(
+                    onTap: () {
+                      GameController.undo();
+                    },
+                    child: Container(
+                      height: itemHeight / 7 * 3,
+                      width: itemHeight + 8,
+                      decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          color: buttonColor),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text('UNDO', style: buttonTextStyle)
+                          ]),
+                    )),
               ]))
         ]));
   }

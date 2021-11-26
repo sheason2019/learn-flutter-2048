@@ -14,4 +14,9 @@ class GameController {
     _refreshFunc();
     Score.initScore();
   }
+
+  static void undo() {
+    GameModel.instance?.undo();
+    _refreshFunc(insert: false);
+  }
 }

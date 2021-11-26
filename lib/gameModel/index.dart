@@ -5,6 +5,8 @@ import 'package:learn_flutter/slotModel/index.dart';
 class GameModel {
   List<List<ItemModel>> _model = [];
   List<List<SlotModel>> _slotModel = [];
+
+  List<List<List<int>>> history = [];
   static GameModel? instance;
 
   void init({bool restart = false}) {
@@ -29,15 +31,32 @@ class GameModel {
     instance = this;
   }
 
-  from(GameModel model) {
-    return [...model.getModel().map((e) => List.from(e))];
-  }
-
   List<List<ItemModel>> getModel() {
     return _model;
   }
 
+  undo() {
+    if (history.length > 1) {
+      List<List<int>> lastModel = history.removeAt(history.length - 1);
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+          _model[i][j].val = lastModel[i][j];
+        }
+      }
+      _model[4] = [];
+    }
+  }
+
   setModel(List<List<ItemModel>> model) {
+    List<List<int>> temp = [];
+    for (int i = 0; i < 4; i++) {
+      List<int> row = [];
+      for (int j = 0; j < 4; j++) {
+        row.add(_model[i][j].val);
+      }
+      temp.add(row);
+    }
+    history.add(temp);
     _model = model;
   }
 
