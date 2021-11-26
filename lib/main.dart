@@ -19,15 +19,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: Scaffold(
+        title: 'Flutter Demo',
+        theme: ThemeData(primarySwatch: Colors.blue),
+        home: Scaffold(
           appBar: AppBar(
             title: const Text('2048'),
           ),
-          body: Column(
-            children: [ScoreWidget(), const GamePanel()],
-          )),
-    );
+          body: Container(
+              constraints: const BoxConstraints(maxWidth: 450),
+              child: Column(
+                children: const [ScoreWidget(), GamePanel()],
+              )),
+        ));
   }
 }

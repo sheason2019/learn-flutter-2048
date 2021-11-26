@@ -9,7 +9,7 @@ class ItemSlot extends StatelessWidget {
         aspectRatio: 1,
         child: Stack(children: [
           Container(
-            margin: const EdgeInsets.all(4.0),
+            margin: const EdgeInsets.all(5.0),
             decoration: BoxDecoration(
                 color: Colors.orange[50],
                 borderRadius: const BorderRadius.all(Radius.circular(8))),

@@ -63,7 +63,7 @@ class _GameItemState extends State<GameItem>
             aspectRatio: 1,
             child: Stack(children: [
               Container(
-                  margin: const EdgeInsets.all(4.0),
+                  margin: const EdgeInsets.all(5.0),
                   height: widget.size.height,
                   width: widget.size.width,
                   decoration: BoxDecoration(

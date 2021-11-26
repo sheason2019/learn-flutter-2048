@@ -215,6 +215,8 @@ class _GamePanelState extends State<GamePanel> {
     List<List<ItemModel>> itemModel = model.getModel();
     List<List<SlotModel>> slotModel = model.getSlotModel();
 
+    int moveLimit = 30;
+
     return AspectRatio(
         aspectRatio: 1,
         child: GestureDetector(
@@ -229,9 +231,9 @@ class _GamePanelState extends State<GamePanel> {
             onVerticalDragUpdate: (e) {
               if (hasMove) return;
               List<List<ItemModel>> newModel = model.getModel();
-              if (e.localPosition.dy - source.dy > 100) {
+              if (e.localPosition.dy - source.dy > moveLimit) {
                 newModel = move(8);
-              } else if (e.localPosition.dy - source.dy < -100) {
+              } else if (e.localPosition.dy - source.dy < -moveLimit) {
                 newModel = move(2);
               }
               if (isModelDiff(newModel, model.getModel())) {
@@ -244,9 +246,9 @@ class _GamePanelState extends State<GamePanel> {
             onHorizontalDragUpdate: (e) {
               if (hasMove) return;
               List<List<ItemModel>> newModel = model.getModel();
-              if (e.localPosition.dx - source.dx > 100) {
+              if (e.localPosition.dx - source.dx > moveLimit) {
                 newModel = move(6);
-              } else if (e.localPosition.dx - source.dx < -100) {
+              } else if (e.localPosition.dx - source.dx < -moveLimit) {
                 newModel = move(4);
               }
               if (isModelDiff(newModel, model.getModel())) {
