@@ -197,8 +197,12 @@ class _GamePanelState extends State<GamePanel> {
         slotPosition = _slotPosition;
         if (temp == null) return;
         itemSize = Size(temp.width - 8, temp.height - 8);
-        model.setModel(insertItem(model.getModel()));
         parentOffset = getParentPosition();
+      });
+      Timer(const Duration(milliseconds: 100), () {
+        setState(() {
+          model.setModel(insertItem(model.getModel()));
+        });
       });
     });
     GameController.registRefreshFunc(() {
