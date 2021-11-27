@@ -21,4 +21,9 @@ class Score {
   static void setSubscribe(Function func) {
     _subscribe = func;
   }
+
+  static void setScore(int val) {
+    _score = val;
+    _subscribe();
+  }
 }
