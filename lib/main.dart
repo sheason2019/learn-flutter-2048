@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:learn_flutter/score/index.dart';
+import 'package:path_provider/path_provider.dart';
 import 'gamePanel/index.dart';
 
 void main() {
@@ -32,4 +35,9 @@ class MyApp extends StatelessWidget {
               )),
         ));
   }
+}
+
+Future<String> get _localPath async {
+  final directory = await getApplicationDocumentsDirectory();
+  return directory.path;
 }
