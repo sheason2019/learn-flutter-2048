@@ -31,6 +31,8 @@ class GameModel {
     // 其实这里应该解耦到一个动画模型列表以实现数据分离，在build函数里合并它和Model以实现数据模型单一职责原则的
     // 但是当时没有想到这么多
     _model.add([]);
+    historyModel = [];
+    historyScore = [];
   }
 
   GameModel() {

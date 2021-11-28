@@ -1,3 +1,3 @@
 class CONSTANTS {
-  static Duration moveDuration = const Duration(milliseconds: 100);
+  static Duration moveDuration = const Duration(milliseconds: 120);
 }
