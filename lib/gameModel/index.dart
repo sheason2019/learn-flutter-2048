@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learn_flutter/game_controller.dart';
 import 'package:learn_flutter/itemModel/index.dart';
 import 'package:learn_flutter/score/score.dart';
 import 'package:learn_flutter/slotModel/index.dart';
@@ -7,8 +8,8 @@ class GameModel {
   List<List<ItemModel>> _model = [];
   List<List<SlotModel>> _slotModel = [];
   // 历史模型的状态储存在这个数组里，以实现UNDO效果
-  List<List<List<int>>> history_model = [];
-  List<int> history_score = [];
+  List<List<List<int>>> historyModel = [];
+  List<int> historyScore = [];
   // 在初始化GmaeModel时会将实例放到这里方便获取，其实应该放到GameController里面的，但是一开始
   // 就在这里建立了一个instance，为了避免不必要的操作，等到后续有空的时候再改吧
   static GameModel? instance;
@@ -41,21 +42,24 @@ class GameModel {
     return _model;
   }
 
-  undo() {
-    if (history_model.length > 1) {
-      List<List<int>> lastModel =
-          history_model.removeAt(history_model.length - 1);
-      for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-          _model[i][j].val = lastModel[i][j];
-        }
+  void setModelFromPureData(List<List<int>> data) {
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        _model[i][j].val = data[i][j];
       }
-      _model[4] = [];
     }
-    Score.setScore(history_score.removeAt(history_score.length - 1));
+    _model[4] = [];
   }
 
-  setModel(List<List<ItemModel>> model) {
+  undo() {
+    if (historyModel.length > 1) {
+      setModelFromPureData(historyModel.removeAt(historyModel.length - 1));
+      _model[4] = [];
+    }
+    Score.setScore(historyScore.removeAt(historyScore.length - 1));
+  }
+
+  static List<List<int>> _getModelCore(List<List<ItemModel>> _model) {
     List<List<int>> temp = [];
     for (int i = 0; i < 4; i++) {
       List<int> row = [];
@@ -64,8 +68,12 @@ class GameModel {
       }
       temp.add(row);
     }
-    history_model.add(temp);
-    history_score.add(Score.getScore());
+    return temp;
+  }
+
+  setModel(List<List<ItemModel>> model) {
+    historyModel.add(_getModelCore(_model));
+    historyScore.add(Score.getScore());
     _model = model;
   }
 
@@ -75,5 +83,14 @@ class GameModel {
 
   setSlotModel(slotModel) {
     _slotModel = slotModel;
+  }
+
+  Map pack() {
+    return {
+      'lastModel': _getModelCore(_model),
+      'lastScore': Score.getScore(),
+      'historyModel': historyModel,
+      'historyScore': historyScore,
+    };
   }
 }

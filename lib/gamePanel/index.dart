@@ -91,13 +91,14 @@ class _GamePanelState extends State<GamePanel> {
           mergeList[j][0].val = mergeList[j][1].val;
           mergeList[j][0].offset = mergeList[j][1].offset;
           newModel[4].add(mergeList[j][0]);
-          Timer(CONSTANTS.moveDuration, () {
-            setState(() {
-              mergeList[j][1].val *= 2;
-              Score.addScore(mergeList[j][1].val);
-            });
-          });
+          mergeList[j][1].val *= 2;
+          Score.addScore(mergeList[j][1].val);
         }
+        Timer(CONSTANTS.moveDuration, () {
+          setState(() {});
+          // 存储数据到本地
+          GameController.writeModel(model.pack());
+        });
       }
     } else if (arg == 4 || arg == 6) {
       for (int i = 0; i < 4; i++) {
@@ -140,13 +141,13 @@ class _GamePanelState extends State<GamePanel> {
           mergeList[j][0].val = mergeList[j][1].val;
           mergeList[j][0].offset = mergeList[j][1].offset;
           newModel[4].add(mergeList[j][0]);
-          Timer(CONSTANTS.moveDuration, () {
-            setState(() {
-              mergeList[j][1].val *= 2;
-              Score.addScore(mergeList[j][1].val);
-            });
-          });
+          mergeList[j][1].val *= 2;
+          Score.addScore(mergeList[j][1].val);
         }
+        Timer(CONSTANTS.moveDuration, () {
+          setState(() {});
+          GameController.writeModel(model.pack());
+        });
       }
     }
     return newModel;
@@ -205,10 +206,53 @@ class _GamePanelState extends State<GamePanel> {
         itemSize = Size(temp.width - 8, temp.height - 8);
         parentOffset = getParentPosition();
       });
-      Timer(const Duration(milliseconds: 100), () {
-        setState(() {
-          model.setModel(insertItem(model.getModel()));
-        });
+      Timer(const Duration(milliseconds: 100), () async {
+        Map? lastModelMap = await GameController.readModel();
+        if (lastModelMap == null) {
+          setState(() {
+            model.setModel(insertItem(model.getModel()));
+          });
+        } else {
+          setState(() {
+            // 复原model
+            List<List<int>> lastModel = [];
+            for (int i = 0; i < lastModelMap["lastModel"].length; i++) {
+              List<int> row = [];
+              for (int j = 0; j < lastModelMap["lastModel"][i].length; j++) {
+                row.add(lastModelMap["lastModel"][i][j]);
+              }
+              lastModel.add(row);
+            }
+            model.setModelFromPureData(lastModel);
+
+            // 复原history model
+            List<List<List<int>>> historyModel = [];
+            for (int i = 0; i < lastModelMap["historyModel"].length; i++) {
+              List<List<int>> modelSlice = [];
+              for (int j = 0; j < lastModelMap["historyModel"][i].length; j++) {
+                List<int> row = [];
+                for (int k = 0;
+                    k < lastModelMap["historyModel"][i][j].length;
+                    k++) {
+                  row.add(lastModelMap["historyModel"][i][j][k]);
+                }
+                modelSlice.add(row);
+              }
+              historyModel.add(modelSlice);
+            }
+            model.historyModel = historyModel;
+
+            //复原history score
+            List<int> historyScore = [];
+            for (int i = 0; i < lastModelMap["historyScore"].length; i++) {
+              historyScore.add(lastModelMap["historyScore"][i]);
+            }
+            model.historyScore = historyScore;
+
+            //复原分数
+            Score.setScore(lastModelMap["lastScore"]);
+          });
+        }
       });
     });
     GameController.registRefreshFunc(({bool insert = true}) {
