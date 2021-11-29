@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -229,7 +230,7 @@ class _GamePanelState extends State<GamePanel> {
             model.setModelFromPureData(lastModel);
 
             // 复原history model
-            List<List<List<int>>> historyModel = [];
+            Queue<List<List<int>>> historyModel = Queue();
             for (int i = 0; i < lastModelMap["historyModel"].length; i++) {
               List<List<int>> modelSlice = [];
               for (int j = 0; j < lastModelMap["historyModel"][i].length; j++) {

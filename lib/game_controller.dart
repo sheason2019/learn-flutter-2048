@@ -29,9 +29,14 @@ class GameController {
     return directory.path;
   }
 
+  static File? fileCache;
+
   static Future<File> get _historyModelFile async {
-    final path = await _localPath;
-    return File('$path/model.json');
+    if (fileCache == null) {
+      final path = await _localPath;
+      fileCache = File('$path/model.json');
+    }
+    return fileCache as File;
   }
 
   static writeModel(Map modelMap) async {
