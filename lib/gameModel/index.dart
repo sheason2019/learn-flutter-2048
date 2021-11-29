@@ -1,4 +1,4 @@
-import 'dart:collection';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:learn_flutter/itemModel/index.dart';
@@ -8,11 +8,7 @@ import 'package:learn_flutter/slotModel/index.dart';
 class GameModel {
   List<List<ItemModel>> _model = [];
   List<List<SlotModel>> _slotModel = [];
-  // 历史模型的状态储存在这个数组里，以实现UNDO效果
-  Queue<List<List<int>>> historyModel = Queue();
-  List<int> historyScore = [];
-  // 在初始化GmaeModel时会将实例放到这里方便获取，其实应该放到GameController里面的，但是一开始
-  // 就在这里建立了一个instance，为了避免不必要的操作，等到后续有空的时候再改吧
+  // 唯一的实例，方便外部调用
   static GameModel? instance;
 
   void init({bool restart = false}) {
@@ -32,8 +28,6 @@ class GameModel {
     // 其实这里应该解耦到一个动画模型列表以实现数据分离，在build函数里合并它和Model以实现数据模型单一职责原则的
     // 但是当时没有想到这么多
     _model.add([]);
-    historyModel = Queue();
-    historyScore = [];
   }
 
   GameModel() {
@@ -54,14 +48,6 @@ class GameModel {
     _model[4] = [];
   }
 
-  undo() {
-    if (historyModel.length > 1) {
-      setModelFromPureData(historyModel.removeLast());
-      _model[4] = [];
-    }
-    Score.setScore(historyScore.removeAt(historyScore.length - 1));
-  }
-
   static List<List<int>> _getModelCore(List<List<ItemModel>> _model) {
     List<List<int>> temp = [];
     for (int i = 0; i < 4; i++) {
@@ -75,8 +61,6 @@ class GameModel {
   }
 
   setModel(List<List<ItemModel>> model) {
-    historyModel.add(_getModelCore(_model));
-    historyScore.add(Score.getScore());
     _model = model;
   }
 
@@ -88,12 +72,10 @@ class GameModel {
     _slotModel = slotModel;
   }
 
-  Map pack() {
+  Map<String, Object?> pack() {
     return {
-      'lastModel': _getModelCore(_model),
-      'lastScore': Score.getScore(),
-      'historyModel': historyModel.toList(),
-      'historyScore': historyScore,
+      'model': json.encode(_getModelCore(_model)),
+      'score': Score.getScore(),
     };
   }
 }

@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:learn_flutter/score/index.dart';
 import 'gamePanel/index.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(

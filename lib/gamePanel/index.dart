@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -44,6 +43,7 @@ class _GamePanelState extends State<GamePanel> {
       ...model.getModel().map((e) => List.from(e))
     ];
     newModel[4] = [];
+    int addScore = 0;
 
     if (arg == 2 || arg == 8) {
       for (int i = 0; i < 4; i++) {
@@ -87,20 +87,18 @@ class _GamePanelState extends State<GamePanel> {
           newModel[j][i].offset = Offset(j.toDouble(), i.toDouble());
         }
         // 合并动画
-        int addScore = 0;
+
         for (int j = 0; j < mergeList.length; j++) {
           mergeList[j][1].val = mergeList[j][1].val ~/ 2;
           mergeList[j][0].val = mergeList[j][1].val;
           mergeList[j][0].offset = mergeList[j][1].offset;
           newModel[4].add(mergeList[j][0]);
-          mergeList[j][1].val *= 2;
           addScore += mergeList[j][1].val;
+          Timer(CONSTANTS.moveDuration, () {
+            mergeList[j][1].val *= 2;
+            setState(() {});
+          });
         }
-        Timer(CONSTANTS.moveDuration, () async {
-          // 存储数据到本地
-          await GameController.writeModel(model.pack());
-          Score.addScore(addScore);
-        });
       }
     } else if (arg == 4 || arg == 6) {
       for (int i = 0; i < 4; i++) {
@@ -138,22 +136,24 @@ class _GamePanelState extends State<GamePanel> {
           newModel[i][j] = rowWithoutZero[j];
           newModel[i][j].offset = Offset(i.toDouble(), j.toDouble());
         }
-        int addScore = 0;
         for (int j = 0; j < mergeList.length; j++) {
           mergeList[j][1].val = mergeList[j][1].val ~/ 2;
           mergeList[j][0].val = mergeList[j][1].val;
           mergeList[j][0].offset = mergeList[j][1].offset;
           newModel[4].add(mergeList[j][0]);
-          mergeList[j][1].val *= 2;
           addScore += mergeList[j][1].val;
+          Timer(CONSTANTS.moveDuration, () {
+            mergeList[j][1].val *= 2;
+            setState(() {});
+          });
         }
-
-        Timer(CONSTANTS.moveDuration, () async {
-          await GameController.writeModel(model.pack());
-          Score.addScore(addScore);
-        });
       }
     }
+    Timer(CONSTANTS.moveDuration, () {
+      // 存储数据到本地
+      GameController.writeModel(model.pack());
+      Score.addScore(addScore);
+    });
     return newModel;
   }
 
@@ -219,42 +219,11 @@ class _GamePanelState extends State<GamePanel> {
         } else {
           setState(() {
             // 复原model
-            List<List<int>> lastModel = [];
-            for (int i = 0; i < lastModelMap["lastModel"].length; i++) {
-              List<int> row = [];
-              for (int j = 0; j < lastModelMap["lastModel"][i].length; j++) {
-                row.add(lastModelMap["lastModel"][i][j]);
-              }
-              lastModel.add(row);
-            }
-            model.setModelFromPureData(lastModel);
-
-            // 复原history model
-            Queue<List<List<int>>> historyModel = Queue();
-            for (int i = 0; i < lastModelMap["historyModel"].length; i++) {
-              List<List<int>> modelSlice = [];
-              for (int j = 0; j < lastModelMap["historyModel"][i].length; j++) {
-                List<int> row = [];
-                for (int k = 0;
-                    k < lastModelMap["historyModel"][i][j].length;
-                    k++) {
-                  row.add(lastModelMap["historyModel"][i][j][k]);
-                }
-                modelSlice.add(row);
-              }
-              historyModel.add(modelSlice);
-            }
-            model.historyModel = historyModel;
-
-            //复原history score
-            List<int> historyScore = [];
-            for (int i = 0; i < lastModelMap["historyScore"].length; i++) {
-              historyScore.add(lastModelMap["historyScore"][i]);
-            }
-            model.historyScore = historyScore;
+            model.setModelFromPureData(
+                GameController.parseStringToModel(lastModelMap["model"]));
 
             //复原分数
-            Score.setScore(lastModelMap["lastScore"]);
+            Score.setScore(lastModelMap["score"]);
           });
         }
       });
@@ -324,7 +293,8 @@ class _GamePanelState extends State<GamePanel> {
                 decoration: BoxDecoration(
                     color: Colors.orange[100],
                     borderRadius: const BorderRadius.all(Radius.circular(8))),
-                child: Stack(children: [
+                child: RepaintBoundary(
+                    child: Stack(children: [
                   Column(
                     children: [
                       for (int i = 0; i < 4; i++)
@@ -367,6 +337,6 @@ class _GamePanelState extends State<GamePanel> {
                             itemModel[i][j].val,
                             size: itemSize,
                           )),
-                ]))));
+                ])))));
   }
 }
