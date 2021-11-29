@@ -86,18 +86,19 @@ class _GamePanelState extends State<GamePanel> {
           newModel[j][i].offset = Offset(j.toDouble(), i.toDouble());
         }
         // 合并动画
+        int addScore = 0;
         for (int j = 0; j < mergeList.length; j++) {
           mergeList[j][1].val = mergeList[j][1].val ~/ 2;
           mergeList[j][0].val = mergeList[j][1].val;
           mergeList[j][0].offset = mergeList[j][1].offset;
           newModel[4].add(mergeList[j][0]);
           mergeList[j][1].val *= 2;
-          Score.addScore(mergeList[j][1].val);
+          addScore += mergeList[j][1].val;
         }
-        Timer(CONSTANTS.moveDuration, () {
-          setState(() {});
+        Timer(CONSTANTS.moveDuration, () async {
           // 存储数据到本地
-          GameController.writeModel(model.pack());
+          await GameController.writeModel(model.pack());
+          Score.addScore(addScore);
         });
       }
     } else if (arg == 4 || arg == 6) {
@@ -136,17 +137,19 @@ class _GamePanelState extends State<GamePanel> {
           newModel[i][j] = rowWithoutZero[j];
           newModel[i][j].offset = Offset(i.toDouble(), j.toDouble());
         }
+        int addScore = 0;
         for (int j = 0; j < mergeList.length; j++) {
           mergeList[j][1].val = mergeList[j][1].val ~/ 2;
           mergeList[j][0].val = mergeList[j][1].val;
           mergeList[j][0].offset = mergeList[j][1].offset;
           newModel[4].add(mergeList[j][0]);
           mergeList[j][1].val *= 2;
-          Score.addScore(mergeList[j][1].val);
+          addScore += mergeList[j][1].val;
         }
-        Timer(CONSTANTS.moveDuration, () {
-          setState(() {});
-          GameController.writeModel(model.pack());
+
+        Timer(CONSTANTS.moveDuration, () async {
+          await GameController.writeModel(model.pack());
+          Score.addScore(addScore);
         });
       }
     }
@@ -341,6 +344,7 @@ class _GamePanelState extends State<GamePanel> {
                     for (int j = 0; j < itemModel[i].length; j++)
                       AnimatedPositioned(
                           duration: CONSTANTS.moveDuration,
+                          curve: Curves.linear,
                           left: slotPosition.isEmpty
                               ? 0
                               : slotPosition[itemModel[i][j].offset.dx.toInt()]
