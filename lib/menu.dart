@@ -33,7 +33,9 @@ class MenuWidget extends StatelessWidget {
           MenuButton(
             width: windowWidth / 5 * 3,
             text: '历史记录',
-            onPress: () {},
+            onPress: () {
+              GameController.end(context);
+            },
           ),
         ],
       )),

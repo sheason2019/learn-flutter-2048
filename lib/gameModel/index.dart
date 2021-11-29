@@ -48,7 +48,7 @@ class GameModel {
     _model[4] = [];
   }
 
-  static List<List<int>> _getModelCore(List<List<ItemModel>> _model) {
+  static List<List<int>> getModelCore(List<List<ItemModel>> _model) {
     List<List<int>> temp = [];
     for (int i = 0; i < 4; i++) {
       List<int> row = [];
@@ -74,7 +74,7 @@ class GameModel {
 
   Map<String, Object?> pack() {
     return {
-      'model': json.encode(_getModelCore(_model)),
+      'model': json.encode(getModelCore(_model)),
       'score': Score.getScore(),
     };
   }

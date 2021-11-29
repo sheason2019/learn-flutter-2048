@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:learn_flutter/ending.dart';
 import 'package:learn_flutter/gameModel/index.dart';
 import 'package:learn_flutter/score/score.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import './ending.dart';
 
 class GameController {
   // ignore: prefer_function_declarations_over_variables
@@ -72,5 +75,13 @@ class GameController {
       lastModel.add(row);
     }
     return lastModel;
+  }
+
+  static void end(BuildContext context) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Ending(
+          score: Score.getScore(),
+          model: GameModel.getModelCore(GameModel.instance!.getModel()));
+    }));
   }
 }
