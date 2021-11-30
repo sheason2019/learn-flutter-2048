@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learn_flutter/game_controller.dart';
+import 'package:learn_flutter/history_records.dart';
 
 class MenuWidget extends StatelessWidget {
   const MenuWidget({Key? key}) : super(key: key);
@@ -33,8 +34,10 @@ class MenuWidget extends StatelessWidget {
           MenuButton(
             width: windowWidth / 5 * 3,
             text: '历史记录',
-            onPress: () {
-              GameController.end(context);
+            onPress: () async {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const HistoryRecords();
+              }));
             },
           ),
         ],

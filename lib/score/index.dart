@@ -133,7 +133,8 @@ class _ScoreWidgetState extends State<ScoreWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text('BEST', style: titleStyle),
-                        Text(Score.getScore().toString(), style: scoreStyle),
+                        Text(Score.getBestScore().toString(),
+                            style: scoreStyle),
                       ]),
                 ),
                 GestureDetector(

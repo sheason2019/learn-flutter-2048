@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:learn_flutter/game_controller.dart';
 import 'package:learn_flutter/score/index.dart';
 import 'gamePanel/index.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GameController.checkDatabase();
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Flutter Demo',
-        theme: ThemeData(primarySwatch: Colors.blue),
+        theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Roboto"),
         home: Scaffold(
           appBar: AppBar(
             title: const Text('2048'),

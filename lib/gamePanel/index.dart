@@ -25,6 +25,8 @@ class _GamePanelState extends State<GamePanel> {
   List<List<Offset>> slotPosition = [];
   Offset parentOffset = Offset.zero;
 
+  bool _init = false;
+
   void undo() {
     setState(() {
       // GameModel类内部会对model进行操作
@@ -87,7 +89,6 @@ class _GamePanelState extends State<GamePanel> {
           newModel[j][i].offset = Offset(j.toDouble(), i.toDouble());
         }
         // 合并动画
-
         for (int j = 0; j < mergeList.length; j++) {
           mergeList[j][1].val = mergeList[j][1].val ~/ 2;
           mergeList[j][0].val = mergeList[j][1].val;
@@ -157,6 +158,37 @@ class _GamePanelState extends State<GamePanel> {
     return newModel;
   }
 
+  // 原本想通过修改move函数对能否移动进行判断的，但因为动画之类的缘故move的耦合度太高了
+  // 一时间也不知道怎么把它拆开，索性写了个新函数对能否移动进行判断
+  bool canMove() {
+    List<List<int>> data = GameModel.getModelCore(model.getModel());
+    for (int i = 0; i < 4; i++) {
+      int lastValCol = 0, lastValRow = 0;
+      for (int j = 0; j < 4; j++) {
+        // 检测合并
+        if (data[j][i] != 0) {
+          if (lastValCol == data[j][i]) {
+            return true;
+          } else {
+            lastValCol = data[j][i];
+          }
+        } else {
+          return true;
+        }
+        if (data[i][j] != 0) {
+          if (lastValRow == data[i][j]) {
+            return true;
+          } else {
+            lastValRow = data[i][j];
+          }
+        } else {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   bool isModelDiff(
       List<List<ItemModel>> newModel, List<List<ItemModel>> oldModel) {
     bool diff = false;
@@ -215,6 +247,7 @@ class _GamePanelState extends State<GamePanel> {
         if (lastModelMap == null) {
           setState(() {
             model.setModel(insertItem(model.getModel()));
+            _init = true;
           });
         } else {
           setState(() {
@@ -224,6 +257,8 @@ class _GamePanelState extends State<GamePanel> {
 
             //复原分数
             Score.setScore(lastModelMap["score"]);
+
+            _init = true;
           });
         }
       });
@@ -245,6 +280,17 @@ class _GamePanelState extends State<GamePanel> {
     List<List<SlotModel>> slotModel = model.getSlotModel();
 
     int moveLimit = 30;
+
+    if (_init) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (!canMove() && !GameController.ended) {
+          Future.delayed(Duration.zero, () {
+            GameController.end(context);
+          });
+          GameController.ended = true;
+        }
+      });
+    }
 
     return AspectRatio(
         aspectRatio: 1,
