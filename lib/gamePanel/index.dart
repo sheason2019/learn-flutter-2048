@@ -254,7 +254,6 @@ class _GamePanelState extends State<GamePanel> {
             // 复原model
             model.setModelFromPureData(
                 GameController.parseStringToModel(lastModelMap["model"]));
-
             //复原分数
             Score.setScore(lastModelMap["score"]);
 

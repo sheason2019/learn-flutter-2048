@@ -85,10 +85,14 @@ class GameController {
   }
 
   static Future<Map?> readModel() async {
-    final Database db = await getDatabase();
-    final List<Map<String, dynamic>> maps =
-        await db.query('models', orderBy: "step desc");
-    return maps.first;
+    try {
+      final Database db = await getDatabase();
+      final List<Map<String, dynamic>> maps =
+          await db.query('models', orderBy: "step desc");
+      return maps.first;
+    } catch (e) {
+      return null;
+    }
   }
 
   static List<List<int>> parseStringToModel(String str) {

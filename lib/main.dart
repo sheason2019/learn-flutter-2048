@@ -6,7 +6,7 @@ import 'gamePanel/index.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GameController.checkDatabase();
+  await GameController.checkDatabase();
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
